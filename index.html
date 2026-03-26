@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="bs">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>BAGER IoT — Kontrolna Tabla</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Rajdhani:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base:        #080b10;
+      --bg-panel:       #0d1117;
+      --bg-card:        #111820;
+      --bg-card-hover:  #151f2a;
+      --border:         #1e2d3d;
+      --border-bright:  #2a4060;
+      --accent:         #00d4ff;
+      --accent-dim:     #0099bb;
+      --accent-glow:    rgba(0, 212, 255, 0.15);
+      --warn:           #ff6b35;
+      --warn-dim:       #cc4a1a;
+      --danger:         #ff2244;
+      --success:        #00ff88;
+      --success-dim:    #00cc66;
+      --text-primary:   #e8f0f8;
+      --text-secondary: #7a9ab5;
+      --text-dim:       #3a5570;
+      --track-bg:       #0a1520;
+      --radius:         4px;
+      --radius-lg:      8px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { font-size: 14px; scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg-base);
+      color: var(--text-primary);
+      font-family: 'Rajdhani', sans-serif;
+      font-weight: 500;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    body::after {
+      content: '';
+      position: fixed; inset: 0;
+      background: repeating-linear-gradient(
+        0deg, transparent, transparent 2px,
+        rgba(0,0,0,0.04) 2px, rgba(0,0,0,0.04) 4px
+      );
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    header {
+      background: linear-gradient(135deg, #0a1520 0%, #0d1a28 100%);
+      border-bottom: 1px solid var(--border-bright);
+      padding: 0 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 2px 20px rgba(0,0,0,0.5);
+    }
+
+    .logo { display: flex; align-items: center; gap: 12px; }
+
+    .logo-icon {
+      width: 40px; height: 40px;
+      background: var(--accent);
+      clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+      display: flex; align-items: center; justify-content: center;
+      animation: logo-pulse 3s ease-in-out infinite;
+      flex-shrink: 0;
+    }
+
+    @keyframes logo-pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.3); }
+      50%       { box-shadow: 0 0 0 8px rgba(0,212,255,0); }
+    }
+
+    .logo-text {
+      font-family: 'Orbitron', monospace;
+      font-size: 1.3rem; font-weight: 900;
+      letter-spacing: 3px; color: var(--accent);
+      text-shadow: 0 0 20px rgba(0,212,255,0.4);
+    }
+
+    .logo-sub {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: var(--text-secondary);
+      letter-spacing: 2px; margin-top: 2px;
+    }
+
+    .header-status { display: flex; align-items: center; gap: 24px; }
+
+    .status-badge {
+      display: flex; align-items: center; gap: 8px;
+      padding: 6px 14px;
+      border-radius: var(--radius);
+      border: 1px solid var(--border);
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; letter-spacing: 1px;
+      transition: all 0.3s ease;
+    }
+
+    .status-dot {
+      width: 8px; height: 8px;
+      border-radius: 50%; flex-shrink: 0;
+      transition: all 0.3s ease;
+    }
+
+    .status-badge.online  { border-color: var(--success-dim); color: var(--success); background: rgba(0,255,136,0.06); }
+    .status-badge.online .status-dot { background: var(--success); box-shadow: 0 0 8px var(--success); animation: blink 2s ease-in-out infinite; }
+    .status-badge.offline { border-color: var(--danger); color: var(--danger); background: rgba(255,34,68,0.06); }
+    .status-badge.offline .status-dot { background: var(--danger); }
+    .status-badge.connecting { border-color: var(--warn); color: var(--warn); background: rgba(255,107,53,0.06); }
+    .status-badge.connecting .status-dot { background: var(--warn); animation: blink 0.5s ease-in-out infinite; }
+
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50%       { opacity: 0.3; }
+    }
+
+    #latency-display {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.75rem; color: var(--text-secondary); letter-spacing: 1px;
+    }
+
+    main { max-width: 1200px; margin: 0 auto; padding: 2rem 1.5rem 4rem; }
+
+    #alert-bar {
+      display: none;
+      margin-bottom: 1.5rem;
+      padding: 12px 20px;
+      border-left: 4px solid var(--warn);
+      background: rgba(255,107,53,0.1);
+      border-radius: 0 var(--radius) var(--radius) 0;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.8rem; color: var(--warn); letter-spacing: 0.5px;
+    }
+    #alert-bar.visible { display: block; }
+
+    .section-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 1rem; padding-bottom: 0.6rem;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .section-icon {
+      width: 32px; height: 32px;
+      background: var(--accent-glow);
+      border: 1px solid var(--accent-dim);
+      border-radius: var(--radius);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1rem;
+    }
+
+    .section-title {
+      font-family: 'Orbitron', monospace;
+      font-size: 0.7rem; font-weight: 700;
+      letter-spacing: 3px; color: var(--accent); text-transform: uppercase;
+    }
+
+    .section-sub {
+      font-size: 0.75rem; color: var(--text-dim);
+      margin-left: auto; font-family: 'Share Tech Mono', monospace;
+    }
+
+    .controls-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1rem; margin-bottom: 2rem;
+    }
+
+    .motor-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 1.25rem;
+      transition: border-color 0.2s, background 0.2s;
+      position: relative; overflow: hidden;
+    }
+
+    .motor-card::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; width: 3px; height: 100%;
+      background: var(--accent-dim); opacity: 0.4; transition: opacity 0.2s;
+    }
+
+    .motor-card:hover { border-color: var(--border-bright); background: var(--bg-card-hover); }
+    .motor-card:hover::before { opacity: 1; }
+    .motor-card.active::before { background: var(--accent); opacity: 1; box-shadow: 0 0 8px var(--accent); }
+    .motor-card.servo::before { background: #a855f7; }
+    .motor-card.servo.active::before { background: #a855f7; box-shadow: 0 0 8px #a855f7; }
+
+    .motor-header {
+      display: flex; justify-content: space-between;
+      align-items: flex-start; margin-bottom: 1rem;
+    }
+
+    .motor-label { font-size: 0.7rem; font-weight: 700; letter-spacing: 2px; color: var(--text-secondary); text-transform: uppercase; }
+    .motor-name  { font-family: 'Orbitron', monospace; font-size: 0.95rem; font-weight: 700; color: var(--text-primary); margin-top: 3px; }
+
+    .motor-value-display {
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 1.8rem; font-weight: 700; color: var(--accent);
+      text-align: right; line-height: 1; transition: color 0.2s; min-width: 70px;
+    }
+
+    .motor-value-unit {
+      font-size: 0.65rem; color: var(--text-dim);
+      text-align: right; font-family: 'Share Tech Mono', monospace; margin-top: 2px;
+    }
+
+    .slider-container { position: relative; padding: 8px 0; }
+
+    .slider-track-bg {
+      position: absolute; top: 50%; left: 0; right: 0;
+      height: 4px; background: var(--track-bg);
+      border-radius: 2px; transform: translateY(-50%);
+    }
+
+    .slider-fill {
+      position: absolute; top: 50%; height: 4px;
+      border-radius: 2px; transform: translateY(-50%);
+      pointer-events: none; transition: width 0.05s, background 0.2s;
+    }
+
+    input[type="range"] {
+      -webkit-appearance: none; appearance: none;
+      width: 100%; height: 20px;
+      background: transparent; position: relative;
+      cursor: pointer; z-index: 1;
+    }
+
+    input[type="range"]::-webkit-slider-runnable-track { background: transparent; height: 4px; }
+
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none; appearance: none;
+      width: 18px; height: 18px;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: 50%; cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,212,255,0.4);
+      transition: border-color 0.2s, box-shadow 0.2s, transform 0.1s;
+      margin-top: -7px;
+    }
+
+    input[type="range"]::-webkit-slider-thumb:hover {
+      background: var(--accent);
+      box-shadow: 0 0 16px rgba(0,212,255,0.7);
+      transform: scale(1.15);
+    }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 18px; height: 18px;
+      background: var(--bg-card);
+      border: 2px solid var(--accent);
+      border-radius: 50%; cursor: pointer;
+      box-shadow: 0 0 8px rgba(0,212,255,0.4);
+    }
+
+    .servo-slider::-webkit-slider-thumb {
+      border-color: #a855f7;
+      box-shadow: 0 0 8px rgba(168,85,247,0.4);
+    }
+    .servo-slider::-webkit-slider-thumb:hover {
+      background: #a855f7;
+      box-shadow: 0 0 16px rgba(168,85,247,0.7);
+    }
+
+    .slider-labels {
+      display: flex; justify-content: space-between;
+      margin-top: 4px;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: var(--text-dim);
+    }
+
+    .center-indicator {
+      position: absolute; top: 50%; left: 50%;
+      width: 2px; height: 10px;
+      background: var(--border-bright);
+      transform: translate(-50%, -50%);
+      border-radius: 1px; pointer-events: none;
+    }
+
+    .emergency-section { margin-top: 0.5rem; margin-bottom: 2rem; }
+
+    #btn-estop {
+      width: 100%; padding: 1rem;
+      background: linear-gradient(135deg, #1a0008, #200010);
+      border: 2px solid var(--danger);
+      border-radius: var(--radius-lg);
+      color: var(--danger);
+      font-family: 'Orbitron', monospace;
+      font-size: 1rem; font-weight: 900; letter-spacing: 4px;
+      cursor: pointer; text-transform: uppercase;
+      transition: all 0.2s; position: relative; overflow: hidden;
+    }
+
+    #btn-estop::before {
+      content: ''; position: absolute; inset: 0;
+      background: repeating-linear-gradient(
+        45deg, transparent, transparent 8px,
+        rgba(255,34,68,0.04) 8px, rgba(255,34,68,0.04) 16px
+      );
+    }
+
+    #btn-estop:hover {
+      background: linear-gradient(135deg, #300010, #3a0015);
+      box-shadow: 0 0 30px rgba(255,34,68,0.3), inset 0 0 20px rgba(255,34,68,0.1);
+      transform: translateY(-1px);
+    }
+
+    #btn-estop:active { transform: translateY(0px) scale(0.99); box-shadow: 0 0 10px rgba(255,34,68,0.5); }
+
+    .log-section { margin-top: 2rem; }
+
+    #log-container {
+      background: #040810;
+      border: 1px solid var(--border);
+      border-radius: var(--radius-lg);
+      padding: 0.75rem 1rem;
+      height: 160px; overflow-y: auto;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.72rem; line-height: 1.7;
+    }
+
+    .log-entry { display: flex; gap: 10px; padding: 1px 0; border-bottom: 1px solid rgba(30,45,61,0.3); }
+    .log-time { color: var(--text-dim); flex-shrink: 0; }
+    .log-msg.info    { color: var(--text-secondary); }
+    .log-msg.send    { color: var(--accent); }
+    .log-msg.error   { color: var(--danger); }
+    .log-msg.warn    { color: var(--warn); }
+    .log-msg.success { color: var(--success); }
+
+    ::-webkit-scrollbar { width: 4px; }
+    ::-webkit-scrollbar-track { background: var(--bg-panel); }
+    ::-webkit-scrollbar-thumb { background: var(--border-bright); border-radius: 2px; }
+
+    footer {
+      text-align: center; padding: 1.5rem;
+      font-family: 'Share Tech Mono', monospace;
+      font-size: 0.65rem; color: var(--text-dim);
+      border-top: 1px solid var(--border); letter-spacing: 2px;
+    }
+
+    @media (max-width: 640px) {
+      .header-status { gap: 12px; }
+      #latency-display { display: none; }
+      .logo-sub { display: none; }
+      main { padding: 1rem; }
+      .controls-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#080b10" stroke-width="2.5">
+          <path d="M12 2L2 7l10 5 10-5-10-5z"/>
+          <path d="M2 17l10 5 10-5"/>
+          <path d="M2 12l10 5 10-5"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">BAGER IoT</div>
+        <div class="logo-sub">SARAJEVO → MOSTAR CONTROL LINK</div>
+      </div>
+    </div>
+    <div class="header-status">
+      <span id="latency-display">RTT: — ms</span>
+      <div id="ws-status" class="status-badge connecting">
+        <div class="status-dot"></div>
+        <span id="ws-status-text">SPAJANJE</span>
+      </div>
+      <div id="bager-status" class="status-badge offline">
+        <div class="status-dot"></div>
+        <span id="bager-status-text">BAGER OFFLINE</span>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <div id="alert-bar">⚠ UPOZORENJE: Veza prekinuta. Provjeri mrežu i broker konfiguraciju.</div>
+
+    <div class="emergency-section">
+      <button id="btn-estop" onclick="emergencyStop()">
+        ⬡ EMERGENCY STOP — ZAUSTAVI SVE MOTORE ⬡
+      </button>
+    </div>
+
+    <div class="section-header">
+      <div class="section-icon">🔩</div>
+      <div>
+        <div style="font-size:0.65rem;letter-spacing:2px;color:var(--text-dim);text-transform:uppercase;">POGON</div>
+        <div class="section-title">Gusjenice</div>
+      </div>
+      <span class="section-sub">DRV8833 · N20 × 2</span>
+    </div>
+    <div class="controls-grid" id="gusjenice-grid"></div>
+
+    <div class="section-header">
+      <div class="section-icon">🦾</div>
+      <div>
+        <div class="section-title">Ruka Bagera</div>
+      </div>
+      <span class="section-sub">DRV8833 · N20 × 3</span>
+    </div>
+    <div class="controls-grid" id="ruka-grid"></div>
+
+    <div class="section-header">
+      <div class="section-icon">⚙️</div>
+      <div>
+        <div class="section-title">Kabina & Kasika</div>
+      </div>
+      <span class="section-sub">DRV8833 · N20 + Servo</span>
+    </div>
+    <div class="controls-grid" id="ostalo-grid"></div>
+
+    <div class="log-section">
+      <div class="section-header" style="margin-bottom:0.5rem;">
+        <div class="section-icon">📋</div>
+        <div class="section-title">System Log</div>
+        <button onclick="clearLog()" style="margin-left:auto;background:none;border:1px solid var(--border);color:var(--text-dim);padding:4px 10px;border-radius:var(--radius);cursor:pointer;font-family:'Share Tech Mono',monospace;font-size:0.65rem;">CLEAR</button>
+      </div>
+      <div id="log-container"></div>
+    </div>
+  </main>
+
+  <footer>BAGER IOT CONTROL SYSTEM © 2025 · MOSTAR UNIT · SARAJEVO COMMAND POST</footer>
+
+  <script>
+    "use strict";
+
+    // ── KONFIGURACIJA ──────────────────────────────
+    const CONFIG = {
+      // Automatski detektuje cloud (wss://) ili lokalno (ws://)
+      SERVER_URL: window.location.protocol === "https:"
+        ? `wss://${window.location.host}`
+        : `ws://${window.location.host}`,
+      API_TOKEN        : "dev-token-insecure",
+      SEND_DEBOUNCE_MS : 50,
+      PING_INTERVAL_MS : 5000,
+    };
+
+    // ── MOTORI ─────────────────────────────────────
+    const MOTORS = [
+      { id: "gusjenica_lijevo", name: "Gusjenica Lijevo", label: "TRACK LEFT",    min: -255, max: 255, default: 0,  section: "gusjenice-grid", type: "dc",    icon: "←" },
+      { id: "gusjenica_desno",  name: "Gusjenica Desno",  label: "TRACK RIGHT",   min: -255, max: 255, default: 0,  section: "gusjenice-grid", type: "dc",    icon: "→" },
+      { id: "ruka1",            name: "Ruka Segment 1",   label: "ARM SEG-1",     min: -255, max: 255, default: 0,  section: "ruka-grid",      type: "dc",    icon: "◈" },
+      { id: "ruka2",            name: "Ruka Segment 2",   label: "ARM SEG-2",     min: -255, max: 255, default: 0,  section: "ruka-grid",      type: "dc",    icon: "◈" },
+      { id: "ruka3",            name: "Ruka Segment 3",   label: "ARM SEG-3",     min: -255, max: 255, default: 0,  section: "ruka-grid",      type: "dc",    icon: "◈" },
+      { id: "rotacija",         name: "Rotacija Kabine",  label: "CAB ROTATION",  min: -255, max: 255, default: 0,  section: "ostalo-grid",    type: "dc",    icon: "↻" },
+      { id: "servo_kasika",     name: "Servo Kasika",     label: "BUCKET SERVO",  min: 0,    max: 180, default: 90, section: "ostalo-grid",    type: "servo", icon: "⚡" },
+    ];
+
+    // ── STATE ──────────────────────────────────────
+    let ws           = null;
+    let wsConnected  = false;
+    let pingTimestamp = 0;
+    let pingInterval  = null;
+    let sendTimers    = {};
+    let motorValues   = {};
+    MOTORS.forEach(m => { motorValues[m.id] = m.default; });
+
+    // ── UI GENERIRANJE ─────────────────────────────
+    function buildUI() {
+      MOTORS.forEach(motor => {
+        const container = document.getElementById(motor.section);
+        if (!container) return;
+        const isServo = motor.type === "servo";
+        const isBidi  = motor.min < 0;
+
+        const card = document.createElement("div");
+        card.className = `motor-card${isServo ? " servo" : ""}`;
+        card.id = `card-${motor.id}`;
+
+        card.innerHTML = `
+          <div class="motor-header">
+            <div>
+              <div class="motor-label">${motor.label}</div>
+              <div class="motor-name">${motor.icon} ${motor.name}</div>
+            </div>
+            <div>
+              <div class="motor-value-display" id="val-${motor.id}">${motor.default}</div>
+              <div class="motor-value-unit">${isServo ? "STUPNJEVI" : "PWM"}</div>
+            </div>
+          </div>
+          <div class="slider-container">
+            <div class="slider-track-bg"></div>
+            ${isBidi ? '<div class="center-indicator"></div>' : ''}
+            <div class="slider-fill" id="fill-${motor.id}"></div>
+            <input type="range" id="slider-${motor.id}"
+              class="${isServo ? 'servo-slider' : ''}"
+              min="${motor.min}" max="${motor.max}"
+              value="${motor.default}" step="1" />
+          </div>
+          <div class="slider-labels">
+            <span>${motor.min}</span>
+            ${isBidi ? '<span>0</span>' : ''}
+            <span>${motor.max}</span>
+          </div>`;
+
+        container.appendChild(card);
+
+        const slider = card.querySelector(`#slider-${motor.id}`);
+        slider.addEventListener("input",  () => onSliderChange(motor, slider));
+        slider.addEventListener("change", () => onSliderRelease(motor, slider));
+        updateFill(motor.id, motor.default, motor.min, motor.max, isServo);
+      });
+    }
+
+    function updateFill(motorId, value, min, max, isServo) {
+      const fill = document.getElementById(`fill-${motorId}`);
+      if (!fill) return;
+      if (min < 0) {
+        const fillPct = Math.abs(value) / max * 50;
+        if (value >= 0) {
+          fill.style.left  = "50%";
+          fill.style.width = `${fillPct}%`;
+          fill.style.background = "linear-gradient(90deg, var(--accent-dim), var(--accent))";
+        } else {
+          fill.style.left  = `${50 - fillPct}%`;
+          fill.style.width = `${fillPct}%`;
+          fill.style.background = "linear-gradient(90deg, var(--warn), var(--warn-dim))";
+        }
+      } else {
+        const pct = (value - min) / (max - min) * 100;
+        fill.style.left  = "0%";
+        fill.style.width = `${pct}%`;
+        fill.style.background = "linear-gradient(90deg, #7c3aed, #a855f7)";
+      }
+    }
+
+    // ── SLIDER EVENTS ──────────────────────────────
+    function onSliderChange(motor, slider) {
+      const val = parseInt(slider.value);
+      motorValues[motor.id] = val;
+      document.getElementById(`val-${motor.id}`).textContent = val;
+      updateFill(motor.id, val, motor.min, motor.max, motor.type === "servo");
+      document.getElementById(`card-${motor.id}`).classList.add("active");
+      if (sendTimers[motor.id]) clearTimeout(sendTimers[motor.id]);
+      sendTimers[motor.id] = setTimeout(() => sendMotorCommand(motor.id, val), CONFIG.SEND_DEBOUNCE_MS);
+    }
+
+    function onSliderRelease(motor, slider) {
+      sendMotorCommand(motor.id, parseInt(slider.value));
+      setTimeout(() => document.getElementById(`card-${motor.id}`).classList.remove("active"), 500);
+    }
+
+    // ── WEBSOCKET ──────────────────────────────────
+    function connectWS() {
+      const url = `${CONFIG.SERVER_URL}?token=${CONFIG.API_TOKEN}`;
+      log("info", `Spajanje na: ws://localhost:3000`);
+      setWsStatus("connecting");
+
+      try { ws = new WebSocket(url); }
+      catch (e) {
+        log("error", "WS greška: " + e.message);
+        setTimeout(connectWS, 5000);
+        return;
+      }
+
+      ws.onopen = () => {
+        wsConnected = true;
+        setWsStatus("online");
+        log("success", "WebSocket spojen na backend!");
+        document.getElementById("alert-bar").classList.remove("visible");
+        startPing();
+      };
+
+      ws.onmessage = (event) => {
+        try { handleServerMessage(JSON.parse(event.data)); }
+        catch (e) { log("warn", "Greška parsiranja: " + e.message); }
+      };
+
+      ws.onclose = (e) => {
+        wsConnected = false;
+        setWsStatus("offline");
+        setBagerStatus(false);
+        stopPing();
+        log("warn", `WS prekinut (${e.code}). Ponovni spoj za 5s...`);
+        const bar = document.getElementById("alert-bar");
+        bar.textContent = `⚠ WS veza prekinuta (${e.code}). Ponovni spoj za 5s...`;
+        bar.classList.add("visible");
+        setTimeout(connectWS, 5000);
+      };
+
+      ws.onerror = () => log("error", "WebSocket greška. Pokreni node server.js!");
+    }
+
+    function handleServerMessage(msg) {
+      switch (msg.type) {
+        case "init":
+          log("success", `Init: MQTT=${msg.mqtt}, Bager=${msg.bager}`);
+          setBagerStatus(msg.bager);
+          break;
+        case "bager_status":
+          setBagerStatus(msg.online);
+          log(msg.online ? "success" : "warn", `Bager: ${msg.online ? "ONLINE ✓" : "OFFLINE ✗"}`);
+          break;
+        case "mqtt_status":
+          log(msg.connected ? "success" : "warn", `MQTT: ${msg.connected ? "spojen" : "offline"}`);
+          break;
+        case "emergency_stop":
+          log("error", "⚠ EMERGENCY STOP aktiviran!");
+          break;
+        case "pong":
+          const rtt = Date.now() - pingTimestamp;
+          document.getElementById("latency-display").textContent = `RTT: ${rtt}ms`;
+          break;
+        case "heartbeat":
+          setBagerStatus(msg.bager);
+          break;
+        case "error":
+          log("error", "Server greška: " + msg.error);
+          break;
+      }
+    }
+
+    function sendMotorCommand(motorId, value) {
+      if (!ws || ws.readyState !== WebSocket.OPEN) {
+        log("warn", `WS nije spojen! Komanda za ${motorId} odbijena.`);
+        return;
+      }
+      ws.send(JSON.stringify({ type: "motor_command", motorId, value }));
+      log("send", `→ ${motorId} = ${value}`);
+    }
+
+    function emergencyStop() {
+      MOTORS.forEach(motor => {
+        const slider = document.getElementById(`slider-${motor.id}`);
+        if (!slider) return;
+        const stopVal = motor.type === "servo" ? 90 : 0;
+        slider.value = stopVal;
+        onSliderChange(motor, slider);
+      });
+      if (ws && ws.readyState === WebSocket.OPEN) {
+        ws.send(JSON.stringify({ type: "emergency_stop" }));
+      }
+      log("error", "⚠⚠⚠ EMERGENCY STOP! Svi motori zaustavljeni.");
+      const btn = document.getElementById("btn-estop");
+      btn.style.background = "linear-gradient(135deg, #3a0010, #500020)";
+      setTimeout(() => { btn.style.background = ""; }, 500);
+    }
+
+    // ── STATUS ─────────────────────────────────────
+    function setWsStatus(state) {
+      const el  = document.getElementById("ws-status");
+      const txt = document.getElementById("ws-status-text");
+      el.className = `status-badge ${state}`;
+      txt.textContent = { online: "SERVER OK", offline: "SERVER OFFLINE", connecting: "SPAJANJE" }[state] || state.toUpperCase();
+    }
+
+    function setBagerStatus(online) {
+      const el  = document.getElementById("bager-status");
+      const txt = document.getElementById("bager-status-text");
+      el.className = `status-badge ${online ? "online" : "offline"}`;
+      txt.textContent = online ? "BAGER ONLINE" : "BAGER OFFLINE";
+    }
+
+    // ── PING ───────────────────────────────────────
+    function startPing() {
+      stopPing();
+      pingInterval = setInterval(() => {
+        if (ws && ws.readyState === WebSocket.OPEN) {
+          pingTimestamp = Date.now();
+          ws.send(JSON.stringify({ type: "ping" }));
+        }
+      }, CONFIG.PING_INTERVAL_MS);
+    }
+
+    function stopPing() {
+      if (pingInterval) { clearInterval(pingInterval); pingInterval = null; }
+      document.getElementById("latency-display").textContent = "RTT: — ms";
+    }
+
+    // ── LOG ────────────────────────────────────────
+    const logContainer = document.getElementById("log-container");
+
+    function log(type, message) {
+      const time  = new Date().toLocaleTimeString("bs-BA", { hour12: false });
+      const entry = document.createElement("div");
+      entry.className = "log-entry";
+      entry.innerHTML = `<span class="log-time">${time}</span><span class="log-msg ${type}">${message}</span>`;
+      logContainer.appendChild(entry);
+      while (logContainer.children.length > 100) logContainer.removeChild(logContainer.firstChild);
+      logContainer.scrollTop = logContainer.scrollHeight;
+    }
+
+    function clearLog() {
+      logContainer.innerHTML = "";
+      log("info", "Log obrisan.");
+    }
+
+    // ── START ──────────────────────────────────────
+    buildUI();
+    log("info", "UI inicijaliziran. Pokretanje WS konekcije...");
+    connectWS();
+  </script>
+</body>
+</html>
