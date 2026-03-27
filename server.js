@@ -17,14 +17,17 @@ const MQTT_PORT  = process.env.MQTT_PORT  || 8883;
 const MQTT_USER  = process.env.MQTT_USER  || "bager_esp32";
 const MQTT_PASS  = process.env.MQTT_PASS  || "Esp32#2025!";
 
+
 const TOPICS = {
   gusjenica_lijevo : "profesor/bager/motor_gusjenica_lijevo",
   gusjenica_desno  : "profesor/bager/motor_gusjenica_desno",
   ruka1            : "profesor/bager/motor_ruka1",
   ruka2            : "profesor/bager/motor_ruka2",
   ruka3            : "profesor/bager/motor_ruka3",
+  ruka4            : "profesor/bager/motor_ruka4",      // ← NOVO
   rotacija         : "profesor/bager/motor_rotacija",
   servo_kasika     : "profesor/bager/servo_kasika",
+  svjetlo          : "profesor/bager/svjetlo",          // ← NOVO
 };
 
 const TOPIC_STATUS = "bager/status";
