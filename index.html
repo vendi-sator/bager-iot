@@ -1,95 +1,144 @@
 <!DOCTYPE html>
 <html lang="bs">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
-  <title>BAGER IoT</title>
-  <link href="https://fonts.googleapis.com/css2?family=Black+Ops+One&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
+  <title>Bager IoT</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
     :root {
-      --black:   #0a0a0a;
-      --black2:  #111111;
-      --black3:  #1a1a1a;
-      --yellow:  #f5c400;
-      --yellow2: #e0b000;
-      --yellow3: #ffd740;
-      --red:     #e53935;
-      --green:   #00c853;
-      --gray:    #2a2a2a;
-      --text:    #f0f0f0;
-      --textdim: #666;
+      --bg:       #0e0e0e;
+      --bg2:      #161616;
+      --bg3:      #1e1e1e;
+      --border:   #2a2a2a;
+      --yellow:   #f0c000;
+      --yellowd:  #c09800;
+      --red:      #cc3333;
+      --green:    #2ecc71;
+      --white:    #ebebeb;
+      --dim:      #555;
+      --font:     'IBM Plex Mono', monospace;
+      --title:    'Bebas Neue', cursive;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
 
-    body {
-      background: var(--black);
-      color: var(--text);
-      font-family: 'Share Tech Mono', monospace;
+    html, body {
+      background: var(--bg);
+      color: var(--white);
+      font-family: var(--font);
       min-height: 100vh;
-      overflow-x: hidden;
+      font-size: 13px;
     }
 
     /* ── HEADER ── */
     header {
-      background: var(--yellow);
-      padding: 10px 16px;
       display: flex;
       align-items: center;
       justify-content: space-between;
-      border-bottom: 4px solid #000;
+      padding: 0 16px;
+      height: 52px;
+      background: var(--yellow);
+      border-bottom: 3px solid #000;
+      position: sticky;
+      top: 0;
+      z-index: 10;
     }
 
-    .logo {
-      font-family: 'Black Ops One', cursive;
-      font-size: 1.4rem;
+    .site-title {
+      font-family: var(--title);
+      font-size: 1.6rem;
+      letter-spacing: 4px;
       color: #000;
-      letter-spacing: 3px;
+      line-height: 1;
     }
 
-    .logo span { color: #333; font-size: 0.7rem; display: block; letter-spacing: 2px; margin-top: -2px; }
+    .header-right {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
 
-    .status-row { display: flex; gap: 8px; align-items: center; }
-
-    .badge {
-      font-size: 0.6rem;
-      letter-spacing: 1px;
-      padding: 4px 8px;
-      border: 2px solid #000;
-      font-family: 'Share Tech Mono', monospace;
-      font-weight: bold;
+    .pill {
       display: flex;
       align-items: center;
       gap: 5px;
+      background: rgba(0,0,0,0.15);
+      border: 1px solid rgba(0,0,0,0.3);
+      padding: 4px 10px;
+      font-size: 0.65rem;
+      letter-spacing: 1px;
+      color: #000;
+      font-weight: 600;
     }
 
-    .badge.ok   { background: var(--green); color: #000; }
-    .badge.off  { background: var(--red);   color: #fff; }
-    .badge.wait { background: #888;         color: #000; }
+    .pill.bad  { background: var(--red);   color: #fff; border-color: var(--red); }
+    .pill.good { background: #000; color: var(--yellow); border-color: #000; }
 
-    .dot { width: 7px; height: 7px; border-radius: 50%; background: #000; }
-    .badge.ok .dot   { animation: blink 1.5s infinite; }
-    @keyframes blink { 0%,100%{opacity:1} 50%{opacity:0.2} }
+    .dot {
+      width: 6px; height: 6px;
+      border-radius: 50%;
+      background: currentColor;
+    }
+    .pill.good .dot { animation: pulse 2s infinite; }
+    @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-    /* ── MAIN ── */
-    main { padding: 12px; display: flex; flex-direction: column; gap: 12px; max-width: 700px; margin: 0 auto; }
+    /* ── TEMP BAR ── */
+    .temp-bar {
+      background: var(--bg2);
+      border-bottom: 1px solid var(--border);
+      padding: 8px 16px;
+      display: flex;
+      align-items: center;
+      gap: 20px;
+      font-size: 0.7rem;
+      letter-spacing: 1px;
+      color: var(--dim);
+    }
+
+    .temp-val {
+      color: var(--yellow);
+      font-size: 1rem;
+      font-weight: 600;
+    }
+
+    /* ── LAYOUT ── */
+    main {
+      max-width: 640px;
+      margin: 0 auto;
+      padding: 14px 12px 80px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+    }
 
     /* ── SECTION ── */
-    .section-label {
-      font-family: 'Black Ops One', cursive;
-      font-size: 0.65rem;
+    .sec-title {
+      font-family: var(--title);
+      font-size: 0.85rem;
       letter-spacing: 4px;
       color: var(--yellow);
-      border-left: 4px solid var(--yellow);
-      padding-left: 8px;
       margin-bottom: 8px;
+      padding-bottom: 6px;
+      border-bottom: 1px solid var(--border);
     }
 
     /* ── CARD ── */
     .card {
-      background: var(--black2);
-      border: 2px solid var(--black3);
+      background: var(--bg2);
+      border: 1px solid var(--border);
       padding: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .sublabel {
+      font-size: 0.6rem;
+      letter-spacing: 2px;
+      color: var(--dim);
+      margin-bottom: 4px;
+      text-transform: uppercase;
     }
 
     /* ── HOLD BUTTON ── */
@@ -97,276 +146,263 @@
 
     .btn {
       flex: 1;
-      padding: 18px 8px;
-      font-family: 'Black Ops One', cursive;
-      font-size: 1rem;
+      padding: 16px 6px;
+      font-family: var(--title);
+      font-size: 1.05rem;
       letter-spacing: 2px;
-      border: 3px solid var(--yellow);
-      background: var(--black3);
+      background: var(--bg3);
+      border: 2px solid var(--yellow);
       color: var(--yellow);
       cursor: pointer;
       user-select: none;
-      transition: background 0.05s, transform 0.05s;
       -webkit-user-select: none;
       touch-action: none;
+      transition: background 0.06s, color 0.06s;
     }
 
-    .btn:active,
-    .btn.pressed {
+    .btn.active,
+    .btn:active {
       background: var(--yellow);
       color: #000;
-      transform: scale(0.97);
     }
 
-    .btn.red-btn {
-      border-color: var(--red);
-      color: var(--red);
-    }
-    .btn.red-btn.pressed,
-    .btn.red-btn:active {
-      background: var(--red);
-      color: #fff;
-    }
+    .btn.danger { border-color: var(--red); color: var(--red); }
+    .btn.danger.active { background: var(--red); color: #fff; }
 
-    /* ── GUSJENICE — special 2x2 layout ── */
-    .drive-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      grid-template-rows: auto auto;
-      gap: 8px;
-    }
-
-    .drive-grid .btn-fwd { grid-column: 1 / 3; }
-
-    /* ── SLIDER ── */
-    .slider-wrap { padding: 4px 0 8px; }
-    .slider-label { font-size: 0.65rem; color: var(--textdim); margin-bottom: 6px; letter-spacing: 1px; }
-
-    input[type="range"] {
-      -webkit-appearance: none;
-      width: 100%; height: 8px;
-      background: var(--gray);
-      outline: none;
-      cursor: pointer;
-    }
-    input[type="range"]::-webkit-slider-thumb {
-      -webkit-appearance: none;
-      width: 28px; height: 28px;
-      background: var(--yellow);
-      border: 3px solid #000;
-      cursor: pointer;
-    }
-    .slider-val {
-      text-align: center;
-      font-size: 1.2rem;
-      color: var(--yellow);
-      margin-top: 6px;
-    }
-
-    /* ── SVJETLO TOGGLE ── */
-    .toggle-btn {
+    /* ── TOGGLE ── */
+    .toggle {
       width: 100%;
-      padding: 16px;
-      font-family: 'Black Ops One', cursive;
+      padding: 14px;
+      font-family: var(--title);
       font-size: 1rem;
       letter-spacing: 3px;
-      border: 3px solid var(--yellow);
-      background: var(--black3);
-      color: var(--yellow);
+      background: var(--bg3);
+      border: 2px solid var(--border);
+      color: var(--dim);
       cursor: pointer;
       transition: all 0.1s;
     }
-    .toggle-btn.on {
+    .toggle.on {
       background: var(--yellow);
+      border-color: var(--yellow);
       color: #000;
     }
 
-    /* ── ESTOP ── */
-    #btn-estop {
+    /* ── SERVO SLIDER ── */
+    .slider-section { display: flex; flex-direction: column; gap: 6px; }
+
+    input[type=range] {
+      -webkit-appearance: none;
       width: 100%;
-      padding: 20px;
-      font-family: 'Black Ops One', cursive;
-      font-size: 1.1rem;
-      letter-spacing: 4px;
-      background: var(--black3);
-      border: 4px solid var(--red);
+      height: 6px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      outline: none;
+      cursor: pointer;
+    }
+    input[type=range]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 24px; height: 24px;
+      background: var(--yellow);
+      border: 2px solid #000;
+      cursor: pointer;
+    }
+
+    .servo-readout {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .servo-deg {
+      font-size: 1.4rem;
+      color: var(--yellow);
+      font-weight: 600;
+    }
+
+    /* ── ESTOP ── */
+    #estop {
+      width: 100%;
+      padding: 18px;
+      font-family: var(--title);
+      font-size: 1.2rem;
+      letter-spacing: 5px;
+      background: var(--bg2);
+      border: 3px solid var(--red);
       color: var(--red);
       cursor: pointer;
       position: relative;
       overflow: hidden;
     }
-    #btn-estop::before {
+    #estop::after {
       content: '';
       position: absolute; inset: 0;
-      background: repeating-linear-gradient(45deg, transparent, transparent 8px,
-        rgba(229,57,53,0.05) 8px, rgba(229,57,53,0.05) 16px);
+      background: repeating-linear-gradient(
+        -45deg,
+        transparent, transparent 6px,
+        rgba(204,51,51,0.04) 6px, rgba(204,51,51,0.04) 12px
+      );
     }
-    #btn-estop:active {
-      background: var(--red);
-      color: #fff;
-    }
+    #estop:active { background: var(--red); color: #fff; }
 
     /* ── LOG ── */
     #log {
-      background: #050505;
-      border: 1px solid #222;
-      padding: 8px;
-      height: 100px;
+      background: #090909;
+      border: 1px solid var(--border);
+      padding: 8px 10px;
+      height: 90px;
       overflow-y: auto;
       font-size: 0.65rem;
-      line-height: 1.6;
+      line-height: 1.7;
+      color: var(--dim);
     }
-    .le { display: flex; gap: 8px; }
-    .lt { color: var(--textdim); }
-    .lm.s { color: var(--green); }
-    .lm.e { color: var(--red); }
-    .lm.w { color: #f5a623; }
-    .lm.i { color: #888; }
-    .lm.tx { color: var(--yellow); }
+    .log-line { display: flex; gap: 8px; }
+    .log-t { color: #333; flex-shrink: 0; }
+    .log-s { color: var(--green); }
+    .log-e { color: var(--red); }
+    .log-w { color: #c8a020; }
+    .log-i { color: #444; }
+    .log-x { color: var(--yellow); }
 
-    footer {
-      text-align: center;
-      padding: 16px;
-      font-size: 0.6rem;
-      color: var(--textdim);
-      letter-spacing: 2px;
-      border-top: 2px solid var(--black3);
+    .log-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 6px;
     }
+    .clear-btn {
+      background: none;
+      border: 1px solid var(--border);
+      color: var(--dim);
+      padding: 2px 8px;
+      font-family: var(--font);
+      font-size: 0.6rem;
+      cursor: pointer;
+      letter-spacing: 1px;
+    }
+    .clear-btn:hover { border-color: var(--yellow); color: var(--yellow); }
   </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">
-    BAGER IoT
-    <span>KONTROLNA TABLA v1.1</span>
-  </div>
-  <div class="status-row">
-    <div id="ws-badge" class="badge wait"><div class="dot"></div><span id="ws-txt">SERVER</span></div>
-    <div id="bager-badge" class="badge off"><div class="dot"></div><span id="bager-txt">BAGER</span></div>
+  <div class="site-title">BAGER IoT</div>
+  <div class="header-right">
+    <div class="pill" id="pill-srv"><div class="dot"></div><span id="txt-srv">SERVER</span></div>
+    <div class="pill" id="pill-bag"><div class="dot"></div><span id="txt-bag">BAGER</span></div>
   </div>
 </header>
 
+<div class="temp-bar">
+  <span>TEMPERATURA</span>
+  <span class="temp-val" id="temp-val">— °C</span>
+  <span>VLAGA</span>
+  <span class="temp-val" id="hum-val">— %</span>
+</div>
+
 <main>
 
-  <!-- ESTOP -->
-  <button id="btn-estop" onclick="emergencyStop()">⬡ EMERGENCY STOP ⬡</button>
+  <!-- EMERGENCY STOP -->
+  <button id="estop" onclick="emergencyStop()">⚠ EMERGENCY STOP ⚠</button>
 
   <!-- GUSJENICE -->
   <div>
-    <div class="section-label">GUSJENICE</div>
+    <div class="sec-title">Gusjenice</div>
     <div class="card">
+      <div class="sublabel">Lijeva gusjenica</div>
       <div class="btn-row">
-        <div style="flex:1">
-          <div style="font-size:0.6rem;color:var(--textdim);margin-bottom:6px;letter-spacing:1px;">LIJEVO</div>
-          <div class="btn-row">
-            <button class="btn" data-motor="gusjenica_lijevo" data-val="255">▲</button>
-            <button class="btn" data-motor="gusjenica_lijevo" data-val="-255">▼</button>
-          </div>
-        </div>
-        <div style="flex:1">
-          <div style="font-size:0.6rem;color:var(--textdim);margin-bottom:6px;letter-spacing:1px;">DESNO</div>
-          <div class="btn-row">
-            <button class="btn" data-motor="gusjenica_desno" data-val="255">▲</button>
-            <button class="btn" data-motor="gusjenica_desno" data-val="-255">▼</button>
-          </div>
-        </div>
+        <button class="btn" data-m="gusjenica_lijevo" data-v="255">NAPRIJED</button>
+        <button class="btn" data-m="gusjenica_lijevo" data-v="-255">NAZAD</button>
       </div>
-      <!-- Oba naprijed/nazad -->
-      <div class="btn-row" style="margin-top:8px;">
-        <button class="btn" data-motor="oba" data-val="255" style="padding:14px;">◀◀ OBA NAPRIJED</button>
-        <button class="btn" data-motor="oba" data-val="-255" style="padding:14px;">OBA NAZAD ▶▶</button>
+      <div class="sublabel">Desna gusjenica</div>
+      <div class="btn-row">
+        <button class="btn" data-m="gusjenica_desno" data-v="255">NAPRIJED</button>
+        <button class="btn" data-m="gusjenica_desno" data-v="-255">NAZAD</button>
+      </div>
+      <div class="sublabel">Obje gusjenice</div>
+      <div class="btn-row">
+        <button class="btn" data-m="oba" data-v="255">OBA NAPRIJED</button>
+        <button class="btn" data-m="oba" data-v="-255">OBA NAZAD</button>
       </div>
     </div>
   </div>
 
   <!-- RUKA -->
   <div>
-    <div class="section-label">SEGMENTI RUKE</div>
-    <div class="card" style="display:flex;flex-direction:column;gap:8px;">
-
-      <div>
-        <div style="font-size:0.6rem;color:var(--textdim);margin-bottom:6px;">SEG 1</div>
-        <div class="btn-row">
-          <button class="btn" data-motor="ruka1" data-val="255">▲ GOR</button>
-          <button class="btn" data-motor="ruka1" data-val="-255">▼ DOL</button>
-        </div>
+    <div class="sec-title">Segmenti ruke</div>
+    <div class="card">
+      <div class="sublabel">Segment 1</div>
+      <div class="btn-row">
+        <button class="btn" data-m="ruka1" data-v="255">GORE</button>
+        <button class="btn" data-m="ruka1" data-v="-255">DOLE</button>
       </div>
-
-      <div>
-        <div style="font-size:0.6rem;color:var(--textdim);margin-bottom:6px;">SEG 2</div>
-        <div class="btn-row">
-          <button class="btn" data-motor="ruka2" data-val="255">▲ GOR</button>
-          <button class="btn" data-motor="ruka2" data-val="-255">▼ DOL</button>
-        </div>
+      <div class="sublabel">Segment 2</div>
+      <div class="btn-row">
+        <button class="btn" data-m="ruka2" data-v="255">GORE</button>
+        <button class="btn" data-m="ruka2" data-v="-255">DOLE</button>
       </div>
-
-      <div>
-        <div style="font-size:0.6rem;color:var(--textdim);margin-bottom:6px;">SEG 3</div>
-        <div class="btn-row">
-          <button class="btn" data-motor="ruka3" data-val="255">▲ GOR</button>
-          <button class="btn" data-motor="ruka3" data-val="-255">▼ DOL</button>
-        </div>
+      <div class="sublabel">Segment 3</div>
+      <div class="btn-row">
+        <button class="btn" data-m="ruka3" data-v="255">GORE</button>
+        <button class="btn" data-m="ruka3" data-v="-255">DOLE</button>
       </div>
-
-      <div>
-        <div style="font-size:0.6rem;color:var(--textdim);margin-bottom:6px;">SEG 4</div>
-        <div class="btn-row">
-          <button class="btn" data-motor="ruka4" data-val="255">▲ GOR</button>
-          <button class="btn" data-motor="ruka4" data-val="-255">▼ DOL</button>
-        </div>
+      <div class="sublabel">Segment 4</div>
+      <div class="btn-row">
+        <button class="btn" data-m="ruka4" data-v="255">GORE</button>
+        <button class="btn" data-m="ruka4" data-v="-255">DOLE</button>
       </div>
-
     </div>
   </div>
 
   <!-- ROTACIJA -->
   <div>
-    <div class="section-label">ROTACIJA KABINE</div>
+    <div class="sec-title">Rotacija kabine</div>
     <div class="card">
       <div class="btn-row">
-        <button class="btn" data-motor="rotacija" data-val="255">↺ LIJEVO</button>
-        <button class="btn" data-motor="rotacija" data-val="-255">DESNO ↻</button>
+        <button class="btn" data-m="rotacija" data-v="255">↺ LIJEVO</button>
+        <button class="btn" data-m="rotacija" data-v="-255">DESNO ↻</button>
       </div>
     </div>
   </div>
 
   <!-- KASIKA -->
   <div>
-    <div class="section-label">KASIKA</div>
+    <div class="sec-title">Kasika</div>
     <div class="card">
-      <div class="btn-row" style="margin-bottom:10px;">
-        <button class="btn" data-motor="kasika_btn" data-val="255">▲ OTVORI</button>
-        <button class="btn" data-motor="kasika_btn" data-val="-255">▼ ZATVORI</button>
+      <div class="sublabel">Drži za pomicanje</div>
+      <div class="btn-row">
+        <button class="btn" data-m="kasika_btn" data-v="1">OTVORI</button>
+        <button class="btn" data-m="kasika_btn" data-v="-1">ZATVORI</button>
       </div>
-      <div class="slider-wrap">
-        <div class="slider-label">PRECIZNA POZICIJA</div>
+      <div class="slider-section">
+        <div class="sublabel">Precizna pozicija</div>
         <input type="range" id="servo-slider" min="0" max="180" value="90">
-        <div class="slider-val" id="servo-val">90°</div>
+        <div class="servo-readout">
+          <span style="color:var(--dim);font-size:0.6rem;">0°</span>
+          <span class="servo-deg" id="servo-deg">90°</span>
+          <span style="color:var(--dim);font-size:0.6rem;">180°</span>
+        </div>
       </div>
     </div>
   </div>
 
   <!-- SVJETLO -->
   <div>
-    <div class="section-label">SVJETLO</div>
+    <div class="sec-title">Svjetlo</div>
     <div class="card">
-      <button class="toggle-btn" id="svjetlo-btn" onclick="toggleSvjetlo()">💡 SVJETLO — OFF</button>
+      <button class="toggle" id="svjetlo-btn" onclick="toggleSvjetlo()">SVJETLO — ISKLJUČENO</button>
     </div>
   </div>
 
   <!-- LOG -->
   <div>
-    <div class="section-label" style="display:flex;justify-content:space-between;align-items:center;padding-right:4px;">
-      LOG
-      <span onclick="document.getElementById('log').innerHTML=''" style="cursor:pointer;font-size:0.6rem;color:var(--textdim);">CLEAR</span>
+    <div class="log-header">
+      <div class="sec-title" style="margin:0;border:none;padding:0;">Log</div>
+      <button class="clear-btn" onclick="clearLog()">OBRIŠI</button>
     </div>
     <div id="log"></div>
   </div>
 
 </main>
-
-<footer>BAGER IOT © 2025 · MOSTAR</footer>
 
 <script>
 "use strict";
@@ -375,147 +411,140 @@ const CONFIG = {
   SERVER_URL: window.location.protocol === "https:"
     ? `wss://${window.location.host}`
     : `ws://${window.location.host}`,
-  API_TOKEN: "dev-token-insecure",
-  HOLD_INTERVAL_MS: 100,   // šalje komandu svakih 100ms dok se drži
+  TOKEN: "dev-token-insecure",
+  HOLD_MS: 80,
 };
 
-// ── STATE ──────────────────────────────────────────────
-let ws = null;
-let svjetloOn = false;
-let servoVal  = 90;
+let ws         = null;
+let svjetloOn  = false;
+let servoPos   = 90;
 let holdTimers = {};
 
 // ── LOG ────────────────────────────────────────────────
 function log(type, msg) {
-  const el  = document.getElementById("log");
-  const t   = new Date().toLocaleTimeString("bs-BA", { hour12: false });
-  el.innerHTML += `<div class="le"><span class="lt">${t}</span><span class="lm ${type}">${msg}</span></div>`;
+  const el = document.getElementById("log");
+  const t  = new Date().toLocaleTimeString("bs-BA", { hour12: false });
+  const div = document.createElement("div");
+  div.className = "log-line";
+  div.innerHTML = `<span class="log-t">${t}</span><span class="log-${type}">${msg}</span>`;
+  el.appendChild(div);
+  while (el.children.length > 60) el.removeChild(el.firstChild);
   el.scrollTop = el.scrollHeight;
-  if (el.children.length > 80) el.removeChild(el.firstChild);
 }
 
+function clearLog() { document.getElementById("log").innerHTML = ""; }
+
 // ── WS ─────────────────────────────────────────────────
-function connectWS() {
-  const url = `${CONFIG.SERVER_URL}?token=${CONFIG.API_TOKEN}`;
-  setWS("wait");
-  try { ws = new WebSocket(url); } catch(e) {
-    log("e", "WS greška: " + e.message);
-    setTimeout(connectWS, 5000); return;
-  }
+function connect() {
+  setStatus("srv", false, "SPAJANJE");
+  try { ws = new WebSocket(`${CONFIG.SERVER_URL}?token=${CONFIG.TOKEN}`); }
+  catch(e) { log("e", "WS greška"); setTimeout(connect, 5000); return; }
 
   ws.onopen = () => {
-    setWS("ok");
-    log("s", "Spojen na server!");
+    setStatus("srv", true, "SERVER OK");
+    log("s", "Spojen na server");
   };
 
   ws.onmessage = (ev) => {
     try {
       const m = JSON.parse(ev.data);
-      if (m.type === "init" || m.type === "heartbeat") setBager(m.bager);
-      if (m.type === "bager_status") setBager(m.online);
-      if (m.type === "mqtt_status" && !m.connected) log("w", "MQTT offline");
-      if (m.type === "emergency_stop") log("e", "⚠ ESTOP aktiviran!");
+      if (m.type === "init" || m.type === "heartbeat") {
+        setStatus("bag", m.bager, m.bager ? "BAGER ON" : "OFFLINE");
+        if (m.temperatura) updateTemp(m.temperatura.temp, m.temperatura.hum);
+      }
+      if (m.type === "bager_status") setStatus("bag", m.online, m.online ? "BAGER ON" : "OFFLINE");
+      if (m.type === "temperatura")  updateTemp(m.temp, m.hum);
+      if (m.type === "emergency_stop") log("e", "⚠ EMERGENCY STOP aktiviran");
     } catch(e) {}
   };
 
   ws.onclose = (e) => {
-    setWS("off"); setBager(false);
-    log("w", `WS prekinut (${e.code}). Reconnect za 5s...`);
-    setTimeout(connectWS, 5000);
+    setStatus("srv", false, "OFFLINE");
+    setStatus("bag", false, "OFFLINE");
+    log("w", `Veza prekinuta (${e.code}). Reconnect za 5s...`);
+    setTimeout(connect, 5000);
   };
 
-  ws.onerror = () => log("e", "WS greška — pokreni server.js!");
+  ws.onerror = () => log("e", "WS greška — pokreni server.js");
 }
 
 function send(motorId, value) {
-  if (!ws || ws.readyState !== WebSocket.OPEN) return;
-  ws.send(JSON.stringify({ type: "motor_command", motorId, value }));
+  if (ws && ws.readyState === WebSocket.OPEN)
+    ws.send(JSON.stringify({ type: "motor_command", motorId, value }));
 }
 
-// ── STATUS UI ──────────────────────────────────────────
-function setWS(state) {
-  const b = document.getElementById("ws-badge");
-  const t = document.getElementById("ws-txt");
-  b.className = `badge ${state === "ok" ? "ok" : state === "off" ? "off" : "wait"}`;
-  t.textContent = state === "ok" ? "SERVER OK" : state === "off" ? "OFFLINE" : "SPAJANJE";
+// ── STATUS PILLS ───────────────────────────────────────
+function setStatus(which, ok, text) {
+  const pill = document.getElementById(`pill-${which}`);
+  const txt  = document.getElementById(`txt-${which}`);
+  pill.className = `pill ${ok ? "good" : "bad"}`;
+  txt.textContent = text;
 }
 
-function setBager(online) {
-  const b = document.getElementById("bager-badge");
-  const t = document.getElementById("bager-txt");
-  b.className = `badge ${online ? "ok" : "off"}`;
-  t.textContent = online ? "BAGER ON" : "BAGER OFF";
+// ── TEMPERATURA ────────────────────────────────────────
+function updateTemp(temp, hum) {
+  document.getElementById("temp-val").textContent = temp != null ? temp.toFixed(1) + " °C" : "— °C";
+  document.getElementById("hum-val").textContent  = hum  != null ? hum.toFixed(1)  + " %"  : "— %";
 }
 
-// ── HOLD BUTTONS ───────────────────────────────────────
+// ── HOLD LOGIKA ────────────────────────────────────────
 function startHold(motorId, value) {
   if (holdTimers[motorId]) return;
-  // Pošalji odmah
-  if (motorId === "oba") {
-    send("gusjenica_lijevo", value);
-    send("gusjenica_desno", value);
-  } else if (motorId === "kasika_btn") {
-    // Kasika hold — šalje relativne vrijednosti
-    let current = servoVal;
-    const dir = value > 0 ? 1 : -1;
-    holdTimers[motorId] = setInterval(() => {
-      current = Math.max(0, Math.min(180, current + dir * 3));
-      servoVal = current;
-      document.getElementById("servo-slider").value = current;
-      document.getElementById("servo-val").textContent = current + "°";
-      send("servo_kasika", current);
-    }, CONFIG.HOLD_INTERVAL_MS);
-    return;
-  } else {
-    send(motorId, value);
-  }
 
-  holdTimers[motorId] = setInterval(() => {
+  const fire = () => {
     if (motorId === "oba") {
       send("gusjenica_lijevo", value);
-      send("gusjenica_desno", value);
+      send("gusjenica_desno",  value);
+    } else if (motorId === "kasika_btn") {
+      servoPos = Math.max(0, Math.min(180, servoPos + value * 3));
+      document.getElementById("servo-slider").value = servoPos;
+      document.getElementById("servo-deg").textContent = servoPos + "°";
+      send("servo_kasika", servoPos);
     } else {
       send(motorId, value);
     }
-  }, CONFIG.HOLD_INTERVAL_MS);
+  };
+
+  fire();
+  holdTimers[motorId] = setInterval(fire, CONFIG.HOLD_MS);
 }
 
 function stopHold(motorId) {
-  if (holdTimers[motorId]) {
-    clearInterval(holdTimers[motorId]);
-    holdTimers[motorId] = null;
-  }
+  if (!holdTimers[motorId]) return;
+  clearInterval(holdTimers[motorId]);
+  holdTimers[motorId] = null;
+
   if (motorId === "oba") {
     send("gusjenica_lijevo", 0);
-    send("gusjenica_desno", 0);
+    send("gusjenica_desno",  0);
   } else if (motorId === "kasika_btn") {
-    // ne šaljemo stop za servo
+    // servo ostaje na poziciji, ne šaljemo stop
   } else {
     send(motorId, 0);
   }
 }
 
-// ── BIND HOLD EVENTS ───────────────────────────────────
+// ── BIND BUTTONS ───────────────────────────────────────
 document.querySelectorAll(".btn").forEach(btn => {
-  const motorId = btn.dataset.motor;
-  const value   = parseInt(btn.dataset.val);
+  const m = btn.dataset.m;
+  const v = parseInt(btn.dataset.v);
 
-  const press = () => { btn.classList.add("pressed"); startHold(motorId, value); };
-  const release = () => { btn.classList.remove("pressed"); stopHold(motorId); };
+  const press   = (e) => { e.preventDefault(); btn.classList.add("active");    startHold(m, v); };
+  const release = ()  => {                      btn.classList.remove("active"); stopHold(m);     };
 
-  btn.addEventListener("mousedown",  press);
-  btn.addEventListener("touchstart", (e) => { e.preventDefault(); press(); }, { passive: false });
-  btn.addEventListener("mouseup",    release);
-  btn.addEventListener("mouseleave", release);
-  btn.addEventListener("touchend",   release);
-  btn.addEventListener("touchcancel",release);
+  btn.addEventListener("mousedown",   press,   { passive: false });
+  btn.addEventListener("touchstart",  press,   { passive: false });
+  btn.addEventListener("mouseup",     release);
+  btn.addEventListener("mouseleave",  release);
+  btn.addEventListener("touchend",    release);
+  btn.addEventListener("touchcancel", release);
 });
 
 // ── SERVO SLIDER ───────────────────────────────────────
 document.getElementById("servo-slider").addEventListener("input", (e) => {
-  servoVal = parseInt(e.target.value);
-  document.getElementById("servo-val").textContent = servoVal + "°";
-  send("servo_kasika", servoVal);
+  servoPos = parseInt(e.target.value);
+  document.getElementById("servo-deg").textContent = servoPos + "°";
+  send("servo_kasika", servoPos);
 });
 
 // ── SVJETLO ────────────────────────────────────────────
@@ -523,26 +552,21 @@ function toggleSvjetlo() {
   svjetloOn = !svjetloOn;
   send("svjetlo", svjetloOn ? 1 : 0);
   const btn = document.getElementById("svjetlo-btn");
-  btn.textContent = `💡 SVJETLO — ${svjetloOn ? "ON" : "OFF"}`;
-  btn.className = `toggle-btn ${svjetloOn ? "on" : ""}`;
-  log(svjetloOn ? "s" : "w", `Svjetlo: ${svjetloOn ? "ON" : "OFF"}`);
+  btn.textContent = `SVJETLO — ${svjetloOn ? "UKLJUČENO" : "ISKLJUČENO"}`;
+  btn.className   = `toggle ${svjetloOn ? "on" : ""}`;
 }
 
 // ── EMERGENCY STOP ─────────────────────────────────────
 function emergencyStop() {
-  Object.keys(holdTimers).forEach(k => {
-    clearInterval(holdTimers[k]);
-    holdTimers[k] = null;
-  });
-  document.querySelectorAll(".btn").forEach(b => b.classList.remove("pressed"));
-  if (ws && ws.readyState === WebSocket.OPEN) {
+  Object.keys(holdTimers).forEach(k => { clearInterval(holdTimers[k]); holdTimers[k] = null; });
+  document.querySelectorAll(".btn").forEach(b => b.classList.remove("active"));
+  if (ws && ws.readyState === WebSocket.OPEN)
     ws.send(JSON.stringify({ type: "emergency_stop" }));
-  }
   log("e", "⚠⚠⚠ EMERGENCY STOP!");
 }
 
 // ── START ──────────────────────────────────────────────
-connectWS();
+connect();
 </script>
 </body>
 </html>
