@@ -1,7 +1,5 @@
-/**
- * BAGER IoT — Node.js Backend v1.2.0
- * + ruka4, svjetlo, temperatura
- */
+// Backend server za bager - WebSocket + MQTT bridge
+
 
 const WebSocket = require("ws");
 const mqtt      = require("mqtt");
@@ -9,6 +7,7 @@ const http      = require("http");
 const fs        = require("fs");
 const path      = require("path");
 
+// Konfiguracija - sve iz environment varijabli da ne stoji hardcoded
 const PORT      = process.env.PORT      || 3000;
 const API_TOKEN = process.env.API_TOKEN || "dev-token-insecure";
 const MQTT_HOST = process.env.MQTT_HOST || "365e11b3797543a59f900b24b7046974.s1.eu.hivemq.cloud";
@@ -16,22 +15,23 @@ const MQTT_PORT = process.env.MQTT_PORT || 8883;
 const MQTT_USER = process.env.MQTT_USER || "bager_esp32";
 const MQTT_PASS = process.env.MQTT_PASS || "Esp32#2025!";
 
+// MQTT topici - svaki motor/aktuator ima svoj topic
 const TOPICS = {
-  gusjenica_lijevo : "profesor/bager/motor_gusjenica_lijevo",
-  gusjenica_desno  : "profesor/bager/motor_gusjenica_desno",
-  ruka1            : "profesor/bager/motor_ruka1",
-  ruka2            : "profesor/bager/motor_ruka2",
-  ruka3            : "profesor/bager/motor_ruka3",
-  ruka4            : "profesor/bager/motor_ruka4",
-  rotacija         : "profesor/bager/motor_rotacija",
-  servo_kasika     : "profesor/bager/servo_kasika",
-  svjetlo          : "profesor/bager/svjetlo",
+  gusjenica_lijevo : "bager/motor/gusjenica_lijevo",
+  gusjenica_desno  : "bager/motor/gusjenica_desno",
+  ruka1            : "bager/motor/ruka1",
+  ruka2            : "bager/motor/ruka2",
+  ruka3            : "bager/motor/ruka3",
+  ruka4            : "bager/motor/ruka4",
+  rotacija         : "bager/motor/rotacija",
+  servo_kasika     : "bager/servo/kasika",
+  svjetlo          : "bager/svjetlo",
 };
 
 const TOPIC_STATUS = "bager/status";
-const TOPIC_TEMP   = "profesor/bager/temperatura";
+const TOPIC_TEMP   = "bager/temperatura";
 
-// ── HTTP SERVER ────────────────────────────────────────
+// HTTP server koji servira index.html
 const httpServer = http.createServer((req, res) => {
   const filePath = path.join(__dirname, "index.html");
   fs.readFile(filePath, (err, data) => {
@@ -41,16 +41,18 @@ const httpServer = http.createServer((req, res) => {
   });
 });
 
-// ── WEBSOCKET ──────────────────────────────────────────
+// WebSocket server na istom portu kao HTTP
 const wss     = new WebSocket.Server({ server: httpServer });
 const clients = new Set();
 
+// Šalje poruku svim spojenim klijentima
 function broadcast(msg) {
   const str = JSON.stringify(msg);
   clients.forEach(c => { if (c.readyState === WebSocket.OPEN) c.send(str); });
 }
 
 wss.on("connection", (ws, req) => {
+  // Provjera tokena - odbij ako ne odgovara
   const url   = new URL(req.url, "http://localhost");
   const token = url.searchParams.get("token");
 
@@ -63,6 +65,7 @@ wss.on("connection", (ws, req) => {
   clients.add(ws);
   console.log(`[WS] Novi klijent. Ukupno: ${clients.size}`);
 
+  // Pošalji trenutno stanje novom klijentu
   ws.send(JSON.stringify({
     type        : "init",
     mqtt        : mqttConnected,
@@ -76,6 +79,7 @@ wss.on("connection", (ws, req) => {
 
     switch (msg.type) {
 
+      // Komanda za motor - prosljeđujemo na MQTT broker
       case "motor_command": {
         const topic = TOPICS[msg.motorId];
         if (!topic || !mqttConnected) return;
@@ -83,9 +87,10 @@ wss.on("connection", (ws, req) => {
         break;
       }
 
+      // Emergency stop - sve na nulu odmah
       case "emergency_stop": {
         Object.entries(TOPICS).forEach(([key, topic]) => {
-          const val = key === "servo_kasika" ? 90 : key === "svjetlo" ? 0 : 0;
+          const val = key === "servo_kasika" ? 90 : 0;
           mqttClient.publish(topic, JSON.stringify({ value: val }), { qos: 1 });
         });
         broadcast({ type: "emergency_stop" });
@@ -105,7 +110,7 @@ wss.on("connection", (ws, req) => {
   });
 });
 
-// ── MQTT ───────────────────────────────────────────────
+// MQTT konekcija na HiveMQ Cloud
 let mqttConnected = false;
 let bagerOnline   = false;
 let zadnjaTemp    = null;
@@ -121,14 +126,19 @@ const mqttClient = mqtt.connect(`mqtts://${MQTT_HOST}:${MQTT_PORT}`, {
 mqttClient.on("connect", () => {
   mqttConnected = true;
   console.log("[MQTT] ✓ Spojen!");
+  // Pratimo status bagera i temperaturu
   mqttClient.subscribe(TOPIC_STATUS, { qos: 1 });
   mqttClient.subscribe(TOPIC_TEMP,   { qos: 0 });
   broadcast({ type: "mqtt_status", connected: true });
 });
 
 mqttClient.on("error",     (err) => console.error("[MQTT] Greška:", err.message));
-mqttClient.on("reconnect", ()    => { mqttConnected = false; broadcast({ type: "mqtt_status", connected: false }); });
+mqttClient.on("reconnect", ()    => {
+  mqttConnected = false;
+  broadcast({ type: "mqtt_status", connected: false });
+});
 
+// Primanje poruka od ESP32
 mqttClient.on("message", (topic, payload) => {
   try {
     const data = JSON.parse(payload.toString());
@@ -147,12 +157,11 @@ mqttClient.on("message", (topic, payload) => {
   } catch (e) {}
 });
 
-// Heartbeat
+// Heartbeat svakih 10s da frontend zna je li bager još online
 setInterval(() => {
   broadcast({ type: "heartbeat", bager: bagerOnline, mqtt: mqttConnected, temperatura: zadnjaTemp });
 }, 10000);
 
-// ── START ──────────────────────────────────────────────
 httpServer.listen(PORT, "0.0.0.0", () => {
   console.log(`[SERVER] ✓ Pokrenut na portu ${PORT}`);
 });
