@@ -6,6 +6,7 @@
   <title>Bager IoT</title>
   <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=IBM+Plex+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
+   
     :root {
       --bg:       #0e0e0e;
       --bg2:      #161616;
@@ -31,7 +32,7 @@
       font-size: 13px;
     }
 
-    /* ── HEADER ── */
+    /* header - ljepljiv gore, žut */
     header {
       display: flex;
       align-items: center;
@@ -53,12 +54,9 @@
       line-height: 1;
     }
 
-    .header-right {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
+    .header-right { display: flex; align-items: center; gap: 8px; }
 
+    /* status pillovi - zeleni kad radi, crveni kad ne */
     .pill {
       display: flex;
       align-items: center;
@@ -75,15 +73,11 @@
     .pill.bad  { background: var(--red);   color: #fff; border-color: var(--red); }
     .pill.good { background: #000; color: var(--yellow); border-color: #000; }
 
-    .dot {
-      width: 6px; height: 6px;
-      border-radius: 50%;
-      background: currentColor;
-    }
+    .dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
     .pill.good .dot { animation: pulse 2s infinite; }
     @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
 
-    /* ── TEMP BAR ── */
+    /* traka s temperaturom ispod headera */
     .temp-bar {
       background: var(--bg2);
       border-bottom: 1px solid var(--border);
@@ -95,14 +89,8 @@
       letter-spacing: 1px;
       color: var(--dim);
     }
+    .temp-val { color: var(--yellow); font-size: 1rem; font-weight: 600; }
 
-    .temp-val {
-      color: var(--yellow);
-      font-size: 1rem;
-      font-weight: 600;
-    }
-
-    /* ── LAYOUT ── */
     main {
       max-width: 640px;
       margin: 0 auto;
@@ -112,7 +100,7 @@
       gap: 14px;
     }
 
-    /* ── SECTION ── */
+    /* naslov sekcije */
     .sec-title {
       font-family: var(--title);
       font-size: 0.85rem;
@@ -123,7 +111,6 @@
       border-bottom: 1px solid var(--border);
     }
 
-    /* ── CARD ── */
     .card {
       background: var(--bg2);
       border: 1px solid var(--border);
@@ -141,7 +128,7 @@
       text-transform: uppercase;
     }
 
-    /* ── HOLD BUTTON ── */
+    /* dugmad koja reaguju na hold */
     .btn-row { display: flex; gap: 8px; }
 
     .btn {
@@ -161,15 +148,9 @@
     }
 
     .btn.active,
-    .btn:active {
-      background: var(--yellow);
-      color: #000;
-    }
+    .btn:active { background: var(--yellow); color: #000; }
 
-    .btn.danger { border-color: var(--red); color: var(--red); }
-    .btn.danger.active { background: var(--red); color: #fff; }
-
-    /* ── TOGGLE ── */
+    /* toggle za svjetlo */
     .toggle {
       width: 100%;
       padding: 14px;
@@ -182,19 +163,14 @@
       cursor: pointer;
       transition: all 0.1s;
     }
-    .toggle.on {
-      background: var(--yellow);
-      border-color: var(--yellow);
-      color: #000;
-    }
+    .toggle.on { background: var(--yellow); border-color: var(--yellow); color: #000; }
 
-    /* ── SERVO SLIDER ── */
+    /* slider za servo */
     .slider-section { display: flex; flex-direction: column; gap: 6px; }
 
     input[type=range] {
       -webkit-appearance: none;
-      width: 100%;
-      height: 6px;
+      width: 100%; height: 6px;
       background: var(--bg3);
       border: 1px solid var(--border);
       outline: none;
@@ -208,18 +184,10 @@
       cursor: pointer;
     }
 
-    .servo-readout {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-    .servo-deg {
-      font-size: 1.4rem;
-      color: var(--yellow);
-      font-weight: 600;
-    }
+    .servo-readout { display: flex; justify-content: space-between; align-items: center; }
+    .servo-deg { font-size: 1.4rem; color: var(--yellow); font-weight: 600; }
 
-    /* ── ESTOP ── */
+    /* emergency stop dugme */
     #estop {
       width: 100%;
       padding: 18px;
@@ -237,14 +205,13 @@
       content: '';
       position: absolute; inset: 0;
       background: repeating-linear-gradient(
-        -45deg,
-        transparent, transparent 6px,
+        -45deg, transparent, transparent 6px,
         rgba(204,51,51,0.04) 6px, rgba(204,51,51,0.04) 12px
       );
     }
     #estop:active { background: var(--red); color: #fff; }
 
-    /* ── LOG ── */
+    /* log na dnu */
     #log {
       background: #090909;
       border: 1px solid var(--border);
@@ -261,14 +228,8 @@
     .log-e { color: var(--red); }
     .log-w { color: #c8a020; }
     .log-i { color: #444; }
-    .log-x { color: var(--yellow); }
 
-    .log-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 6px;
-    }
+    .log-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
     .clear-btn {
       background: none;
       border: 1px solid var(--border);
@@ -301,10 +262,9 @@
 
 <main>
 
-  <!-- EMERGENCY STOP -->
   <button id="estop" onclick="emergencyStop()">⚠ EMERGENCY STOP ⚠</button>
 
-  <!-- GUSJENICE -->
+  <!-- gusjenice - hold dugmad -->
   <div>
     <div class="sec-title">Gusjenice</div>
     <div class="card">
@@ -326,7 +286,7 @@
     </div>
   </div>
 
-  <!-- RUKA -->
+  <!-- segmenti ruke -->
   <div>
     <div class="sec-title">Segmenti ruke</div>
     <div class="card">
@@ -353,7 +313,7 @@
     </div>
   </div>
 
-  <!-- ROTACIJA -->
+  <!-- rotacija kabine -->
   <div>
     <div class="sec-title">Rotacija kabine</div>
     <div class="card">
@@ -364,7 +324,7 @@
     </div>
   </div>
 
-  <!-- KASIKA -->
+  <!-- kasika - hold za pomicanje, slider za precizno -->
   <div>
     <div class="sec-title">Kasika</div>
     <div class="card">
@@ -385,7 +345,7 @@
     </div>
   </div>
 
-  <!-- SVJETLO -->
+  <!-- svjetlo - toggle on/off -->
   <div>
     <div class="sec-title">Svjetlo</div>
     <div class="card">
@@ -393,7 +353,7 @@
     </div>
   </div>
 
-  <!-- LOG -->
+  <!-- log poruka -->
   <div>
     <div class="log-header">
       <div class="sec-title" style="margin:0;border:none;padding:0;">Log</div>
@@ -407,23 +367,24 @@
 <script>
 "use strict";
 
+// konfiguracija - automatski detektuje http vs https za ws/wss
 const CONFIG = {
   SERVER_URL: window.location.protocol === "https:"
     ? `wss://${window.location.host}`
     : `ws://${window.location.host}`,
-  TOKEN: "dev-token-insecure",
+  TOKEN  : "dev-token-insecure",
   HOLD_MS: 80,
 };
 
-let ws         = null;
-let svjetloOn  = false;
-let servoPos   = 90;
+let ws        = null;
+let svjetloOn = false;
+let servoPos  = 90;
 let holdTimers = {};
 
-// ── LOG ────────────────────────────────────────────────
+// log funkcija - tip: s=success, e=error, w=warn, i=info
 function log(type, msg) {
-  const el = document.getElementById("log");
-  const t  = new Date().toLocaleTimeString("bs-BA", { hour12: false });
+  const el  = document.getElementById("log");
+  const t   = new Date().toLocaleTimeString("bs-BA", { hour12: false });
   const div = document.createElement("div");
   div.className = "log-line";
   div.innerHTML = `<span class="log-t">${t}</span><span class="log-${type}">${msg}</span>`;
@@ -434,7 +395,7 @@ function log(type, msg) {
 
 function clearLog() { document.getElementById("log").innerHTML = ""; }
 
-// ── WS ─────────────────────────────────────────────────
+// WebSocket konekcija - reconnect automatski svakih 5s
 function connect() {
   setStatus("srv", false, "SPAJANJE");
   try { ws = new WebSocket(`${CONFIG.SERVER_URL}?token=${CONFIG.TOKEN}`); }
@@ -452,8 +413,8 @@ function connect() {
         setStatus("bag", m.bager, m.bager ? "BAGER ON" : "OFFLINE");
         if (m.temperatura) updateTemp(m.temperatura.temp, m.temperatura.hum);
       }
-      if (m.type === "bager_status") setStatus("bag", m.online, m.online ? "BAGER ON" : "OFFLINE");
-      if (m.type === "temperatura")  updateTemp(m.temp, m.hum);
+      if (m.type === "bager_status")   setStatus("bag", m.online, m.online ? "BAGER ON" : "OFFLINE");
+      if (m.type === "temperatura")    updateTemp(m.temp, m.hum);
       if (m.type === "emergency_stop") log("e", "⚠ EMERGENCY STOP aktiviran");
     } catch(e) {}
   };
@@ -468,26 +429,24 @@ function connect() {
   ws.onerror = () => log("e", "WS greška — pokreni server.js");
 }
 
+// šalje motor komandu serveru
 function send(motorId, value) {
   if (ws && ws.readyState === WebSocket.OPEN)
     ws.send(JSON.stringify({ type: "motor_command", motorId, value }));
 }
 
-// ── STATUS PILLS ───────────────────────────────────────
+// mijenja izgled status pilla
 function setStatus(which, ok, text) {
-  const pill = document.getElementById(`pill-${which}`);
-  const txt  = document.getElementById(`txt-${which}`);
-  pill.className = `pill ${ok ? "good" : "bad"}`;
-  txt.textContent = text;
+  document.getElementById(`pill-${which}`).className = `pill ${ok ? "good" : "bad"}`;
+  document.getElementById(`txt-${which}`).textContent = text;
 }
 
-// ── TEMPERATURA ────────────────────────────────────────
 function updateTemp(temp, hum) {
   document.getElementById("temp-val").textContent = temp != null ? temp.toFixed(1) + " °C" : "— °C";
   document.getElementById("hum-val").textContent  = hum  != null ? hum.toFixed(1)  + " %"  : "— %";
 }
 
-// ── HOLD LOGIKA ────────────────────────────────────────
+// hold logika - šalje komande dok je dugme pritisnuto
 function startHold(motorId, value) {
   if (holdTimers[motorId]) return;
 
@@ -496,6 +455,7 @@ function startHold(motorId, value) {
       send("gusjenica_lijevo", value);
       send("gusjenica_desno",  value);
     } else if (motorId === "kasika_btn") {
+      // kasika se pomjera postepeno dok držiš
       servoPos = Math.max(0, Math.min(180, servoPos + value * 3));
       document.getElementById("servo-slider").value = servoPos;
       document.getElementById("servo-deg").textContent = servoPos + "°";
@@ -518,13 +478,13 @@ function stopHold(motorId) {
     send("gusjenica_lijevo", 0);
     send("gusjenica_desno",  0);
   } else if (motorId === "kasika_btn") {
-    // servo ostaje na poziciji, ne šaljemo stop
+    // servo ostaje gdje je, ne šaljemo nulu
   } else {
     send(motorId, 0);
   }
 }
 
-// ── BIND BUTTONS ───────────────────────────────────────
+// bind svih hold dugmadi - radi i na touchu i na mišu
 document.querySelectorAll(".btn").forEach(btn => {
   const m = btn.dataset.m;
   const v = parseInt(btn.dataset.v);
@@ -540,14 +500,14 @@ document.querySelectorAll(".btn").forEach(btn => {
   btn.addEventListener("touchcancel", release);
 });
 
-// ── SERVO SLIDER ───────────────────────────────────────
+// servo slider - šalje direktno pri pomicanju
 document.getElementById("servo-slider").addEventListener("input", (e) => {
   servoPos = parseInt(e.target.value);
   document.getElementById("servo-deg").textContent = servoPos + "°";
   send("servo_kasika", servoPos);
 });
 
-// ── SVJETLO ────────────────────────────────────────────
+// svjetlo toggle
 function toggleSvjetlo() {
   svjetloOn = !svjetloOn;
   send("svjetlo", svjetloOn ? 1 : 0);
@@ -556,7 +516,7 @@ function toggleSvjetlo() {
   btn.className   = `toggle ${svjetloOn ? "on" : ""}`;
 }
 
-// ── EMERGENCY STOP ─────────────────────────────────────
+// emergency stop - zaustavlja sve i šalje na server
 function emergencyStop() {
   Object.keys(holdTimers).forEach(k => { clearInterval(holdTimers[k]); holdTimers[k] = null; });
   document.querySelectorAll(".btn").forEach(b => b.classList.remove("active"));
@@ -565,7 +525,6 @@ function emergencyStop() {
   log("e", "⚠⚠⚠ EMERGENCY STOP!");
 }
 
-// ── START ──────────────────────────────────────────────
 connect();
 </script>
 </body>
